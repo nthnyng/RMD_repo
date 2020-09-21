@@ -13,29 +13,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 #libraries
-
 #get tweets / related information 
 #https://github.com/ropensci/rtweet  <- source of rtweet information
 library(rtweet)
+
 # data manipulation
 library(tidyverse)
 library(tidytext)
-
-```
-
-```{r}
-#If you want to be sure you have the most recent version of rtweet
-
-## install remotes package if it's not already
-if (!requireNamespace("remotes", quietly = TRUE)) {
-  install.packages("remotes")
-}
-
-## install dev version of rtweet from github
-remotes::install_github("ropensci/rtweet")
-
-## load rtweet package
-library(rtweet)
 
 ```
 
@@ -88,7 +72,7 @@ with(rt, points(lng, lat, pch = 20, cex = .75, col = rgb(0, .3, .7, .75)))
 
 ```{r}
 ## random sample for 30 seconds (default)
-rt <- stream_tweets("")
+rt <- stream_tweets(lookup_coords("usa"))
 
 
 ```
@@ -414,6 +398,32 @@ wordcloud(
 )
 ```
 
+# Sentiment Analyais w/ syzuhet package 
+
+```{r}
+#grab only text, put it in a vector object
+potus_textonly <- as.vector(potus2$Text_corpus)
+
+#put the text vector into a function that scores the text based on different sentiment categories. This on matches words with a positive / negative text corpus. Others such as Vadar & SentiStrength use more complex algorithms.
+sentiment_dat <- get_nrc_sentiment(potus_textonly)
+
+#combine the extracted sentiment data with the original dataset
+potus_senti <- bind_cols(potus2, sentiment_dat)
+```
+
+```{r}
+#How positive versus negative are the tweets we extracted?
+
+potus_senti %>%
+  summarise(positivity = mean(positive), negativity = mean(negative)) %>%
+  gather(valence_type, score, positivity:negativity) %>%
+  ggplot() +
+  geom_bar(aes(x = valence_type, y = score, fill = valence_type), stat = "identity") +
+  xlab("Valence Type") +
+  ylab("Sentiment Score") +
+  guides(fill = FALSE) +
+  theme_bw() 
+```
 
 #Network Analysis 
 ## How to visualize text data as a network graph
