@@ -47,7 +47,7 @@ rt %>%
 ```
 
 ```{r}
-## search for 250,000 tweets containing the word data
+## search for 25,000 tweets containing the word data
 rt <- search_tweets(
   "data", n = 25000, retryonratelimit = TRUE
 )
@@ -153,7 +153,10 @@ jkr <- get_favorites("jk_rowling", n = 3000)
 sf <- get_trends("san francisco")
 ```
 
-#Example
+##Example
+
+
+# EXAMPLES
 
 ```{r} 
 #https://juanitorduz.github.io/text-mining-networks-and-visualization-plebiscito-tweets/
@@ -197,15 +200,17 @@ potus <- get_timeline(c("potus"), n = 3200)
 ```
 
 ```{r}
-
+#make sure date is in a readable format year month day; hour minute second
 potus$created_at <- ymd_hms(potus$created_at)
 
 ```
 
 ```{r}
+#create rounded time column to the hour
 potus %>%
   mutate(created_at_r = round_date(created_at, "day")) -> potus2
 
+#plot tweet frequency
 potus2 %>%
   count(created_at_r) %>% 
   ggplot(aes(x = created_at_r, y = n)) +
@@ -594,7 +599,7 @@ E(cc.network)$width <- E(cc.network)$weight/max(E(cc.network)$weight)
 ```
 
 ```{r}
-threshold <- 10 # the minimum number of times a bigram appears
+threshold <- 20 # the minimum number of times a bigram appears
 
 network <-  bigram_count %>%
   filter(weight > threshold) %>%
